@@ -75,7 +75,10 @@
         resultDiv.innerHTML = "<strong>해당 증상으로 진단 가능한 질병이 없습니다.</strong>";
         return;
       }
-
+resultDiv.innerHTML = `
+    <p><strong>📌 아래는 선택한 증상에 기반하여 계산된 질병별 확률입니다.</strong><br>
+    진단 결과는 참고용이며, <u>질병 이름을 클릭하면 상세 정보와 행동 강령</u>을 확인할 수 있습니다.</p>
+  `;
       Object.entries(countMap)
         .sort((a, b) => b[1] - a[1])
         .forEach(([disease, count]) => {
