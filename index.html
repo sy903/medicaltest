@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>자가진단 프로그램</title>
+  <style>
+    body { font-family: 'Arial', sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    h1 { color: #2b7de9; }
+    .symptom { margin: 5px 0; }
+    .result { margin-top: 30px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9; }
+    details { margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+  <h1>🩺 자가진단 프로그램</h1>
+  <p>해당되는 증상을 모두 체크한 후, 아래 버튼을 눌러 진단하세요.</p>
+
+  <form id="symptomForm">
+    <div class="symptom"><input type="checkbox" name="symptom" value="기침"> 기침</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="발열"> 발열</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="콧물"> 콧물</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="근육통"> 근육통</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="숨참"> 숨참</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="두통"> 두통</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="메스꺼움/설사"> 메스꺼움/설사</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="재채기"> 재채기</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="가슴 통증"> 가슴 통증</div>
+    <div class="symptom"><input type="checkbox" name="symptom" value="후각/미각 상실"> 후각/미각 상실</div>
+    <br>
+    <button type="button" onclick="diagnose()">진단하기</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const symptomMap = {
+      "기침": ["감기", "폐렴", "코로나19"],
+      "발열": ["감기", "폐렴", "독감", "코로나19", "장염"],
+      "콧물": ["감기", "알레르기 비염"],
+      "근육통": ["독감", "코로나19"],
+      "숨참": ["폐렴", "천식"],
+      "두통": ["감기", "독감", "코로나19", "긴장성 두통"],
+      "메스꺼움/설사": ["장염", "코로나19"],
+      "재채기": ["감기", "알레르기 비염"],
+      "가슴 통증": ["천식"],
+      "후각/미각 상실": ["코로나19"]
+    };
+
+    const diseaseInfo = {
+      "감기": "바이러스 감염으로 발생하는 흔한 질병입니다.<br><strong>대처:</strong> 휴식, 수분 섭취, 필요 시 진통제.",
+      "폐렴": "폐에 염증이 생기며 고열과 숨참이 동반됩니다.<br><strong>대처:</strong> 병원 방문, 항생제 치료 필요.",
+      "독감": "인플루엔자 바이러스 감염으로 고열, 근육통이 특징입니다.<br><strong>대처:</strong> 타미플루, 격리.",
+      "코로나19": "기침, 발열, 미각/후각 상실이 대표 증상입니다.<br><strong>대처:</strong> 검사 및 자가격리.",
+      "알레르기 비염": "재채기, 콧물 등 알레르기성 반응입니다.<br><strong>대처:</strong> 항히스타민제, 알레르겐 회피.",
+      "장염": "바이러스성 설사, 복통, 메스꺼움이 나타납니다.<br><strong>대처:</strong> 수분 보충, 식이 조절.",
+      "천식": "호흡 곤란, 쌕쌕거림이 나타나는 만성 호흡기 질환입니다.<br><strong>대처:</strong> 흡입기 사용, 병원 진료.",
+      "긴장성 두통": "스트레스성 두통으로 조이는 느낌이 있습니다.<br><strong>대처:</strong> 수면, 스트레스 완화."
+    };
+
+    function diagnose() {
+      const checked = Array.from(document.querySelectorAll('input[name="symptom"]:checked')).map(cb => cb.value);
+      let countMap = {};
+
+      checked.forEach(symptom => {
+        symptomMap[symptom]?.forEach(disease => {
+          countMap[disease] = (countMap[disease] || 0) + 1;
+        });
+      });
+
+      const total = Object.values(countMap).reduce((a, b) => a + b, 0);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
+      if (total === 0) {
+        resultDiv.innerHTML = "<strong>해당 증상으로 진단 가능한 질병이 없습니다.</strong>";
+        return;
+      }
+
+      Object.entries(countMap)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([disease, count]) => {
+          const percent = ((count / total) * 100).toFixed(1);
+          resultDiv.innerHTML += `
+            <details>
+              <summary><strong>${disease}</strong>: ${percent}% 확률</summary>
+              <p>${diseaseInfo[disease]}</p>
+            </details>
+          `;
+        });
+    }
+  </script>
+</body>
+</html>
+
